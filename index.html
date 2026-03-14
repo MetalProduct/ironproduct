@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IronProduct</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Шапка */
+        .header {
+            background: #1e3c5c;
+            color: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .logo {
+            font-size: 42px;
+            font-weight: 800;
+        }
+        
+        .phones {
+            text-align: right;
+        }
+        
+        .phone {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: white;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .work-time {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* Категорії */
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .cat-btn {
+            padding: 12px 30px;
+            background: white;
+            border: 2px solid #1e3c5c;
+            border-radius: 50px;
+            color: #1e3c5c;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .cat-btn:hover {
+            background: #1e3c5c;
+            color: white;
+        }
+        
+        .category-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e3c5c;
+            margin: 40px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #1e3c5c;
+        }
+        
+        /* Сітка товарів */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+            background: #f0f0f0;
+            cursor: pointer;
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.3s;
+        }
+        
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+        
+        .product-info {
+            padding: 15px;
+        }
+        
+        .product-name {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .product-article {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        
+        .product-price {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1e3c5c;
+            margin-bottom: 12px;
+        }
+        
+        .view-btn {
+            background: #1e3c5c;
+            color: white;
+            text-align: center;
+            padding: 8px 0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            border: none;
+        }
+        
+        .view-btn:hover {
+            background: #2b4b6f;
+        }
+        
+        /* Модальне вікно для фото */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            cursor: pointer;
+        }
+        
+        .image-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            object-fit: contain;
+        }
+        
+        /* Модальне вікно товару */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background: white;
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 30px;
+            border-radius: 20px;
+            position: relative;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            background: #f0f0f0;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        .product-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .detail-gallery {
+            width: 100%;
+            height: 400px;
+            background: #f5f7fa;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .detail-gallery img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .detail-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .detail-article {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .detail-price {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1e3c5c;
+            margin: 20px 0;
+        }
+        
+        .specs {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .spec-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .spec-row:last-child {
+            border-bottom: none;
+        }
+        
+        .stock {
+            color: #c62828;
+            font-weight: 600;
+        }
+        
+        .stock.available {
+            color: #27ae60;
+        }
+        
+        .buy-btn {
+            background: #1e3c5c;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .delivery-block {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 16px;
+            margin-top: 30px;
+        }
+        
+        .delivery-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e3c5c;
+            margin-bottom: 15px;
+        }
+        
+        .delivery-list {
+            list-style: none;
+        }
+        
+        .delivery-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .delivery-list li:before {
+            content: "•";
+            color: #1e3c5c;
+            font-weight: bold;
+            font-size: 20px;
+            position: absolute;
+            left: 5px;
+        }
+        
+        /* Телефони внизу */
+        .footer-phones {
+            text-align: center;
+            margin: 50px 0 30px;
+            padding: 40px 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        
+        .footer-phones-title {
+            font-size: 24px;
+            color: #1e3c5c;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .footer-phones-numbers {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .footer-phone {
+            font-size: 30px;
+            font-weight: 800;
+            color: #1e3c5c;
+            text-decoration: none;
+        }
+        
+        .footer-work-time {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        @media (max-width: 1100px) {
+            .products-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .product-detail {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .phones {
+                text-align: center;
+                margin-top: 10px;
+            }
+            .footer-phones-numbers {
+                gap: 20px;
+            }
+            .footer-phone {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ШАПКА -->
+        <div class="header">
+            <div class="logo">IronProduct</div>
+            <div class="phones">
+                <a href="tel:+380975544200" class="phone">+380 97 554 42 00</a>
+                <a href="tel:+380989036614" class="phone">+380 98 903 66 14</a>
+                <div class="work-time">⏰ Без вихідних: 8:30 - 22:00</div>
+            </div>
+        </div>
+
+        <!-- КНОПКИ КАТЕГОРІЙ -->
+        <div class="categories">
+            <button class="cat-btn" onclick="scrollToCategory('doors')">ДВЕРІ</button>
+            <button class="cat-btn" onclick="scrollToCategory('navisy')">НАВІСИ</button>
+            <button class="cat-btn" onclick="scrollToCategory('gates')">ВОРОТА</button>
+        </div>
+
+        <!-- ДВЕРІ -->
+        <div id="doors" class="category-title">ДВЕРІ</div>
+        <div class="products-grid" id="doorsGrid"></div>
+
+        <!-- НАВІСИ -->
+        <div id="navisy" class="category-title">НАВІСИ</div>
+        <div class="products-grid" id="navisyGrid"></div>
+
+        <!-- ВОРОТА -->
+        <div id="gates" class="category-title">ВОРОТА</div>
+        <div class="products-grid" id="gatesGrid"></div>
+        
+        <!-- ТЕЛЕФОНИ ВНИЗУ -->
+        <div class="footer-phones">
+            <div class="footer-phones-title">📞 ЗАМОВИТИ ПО ТЕЛЕФОНУ</div>
+            <div class="footer-phones-numbers">
+                <a href="tel:+380975544200" class="footer-phone">+380 97 554 42 00</a>
+                <a href="tel:+380989036614" class="footer-phone">+380 98 903 66 14</a>
+            </div>
+            <div class="footer-work-time">⏰ Без вихідних: 8:30 - 22:00</div>
+        </div>
+    </div>
+    
+    <!-- МОДАЛЬНЕ ВІКНО ДЛЯ ФОТО -->
+    <div id="imageModal" class="image-modal" onclick="this.style.display='none'">
+        <img id="expandedImg" src="">
+    </div>
+    
+    <!-- МОДАЛЬНЕ ВІКНО ДЛЯ ТОВАРУ -->
+    <div id="productModal" class="modal" onclick="if(event.target===this) closeModal()">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Дані товарів
+        const products = {
+            doors: [
+                { name: 'Двері "Стандарт"', article: 'DR-001', price: '4500', img: 'door1.jpg', height: '2000мм', width: '800мм', material: 'Метал', stock: 'Є', inStock: true },
+                { name: 'Двері "Преміум"', article: 'DR-002', price: '6500', img: 'door2.jpg', height: '2000мм', width: '900мм', material: 'Метал+дерево', stock: 'Є', inStock: true },
+                { name: 'Двері з дзеркалом', article: 'DR-003', price: '7800', img: 'door3.jpg', height: '2000мм', width: '800мм', material: 'Метал/дзеркало', stock: 'Немає', inStock: false },
+                { name: 'Двері технічні', article: 'DR-004', price: '3200', img: 'door4.jpg', height: '1900мм', width: '700мм', material: 'Метал', stock: 'Є', inStock: true },
+                { name: 'Двері з ковкою', article: 'DR-005', price: '8900', img: 'door5.jpg', height: '2000мм', width: '900мм', material: 'Метал/ковка', stock: 'Під замовлення', inStock: false }
+            ],
+            navisy: [
+                { name: 'Навіс 80мм', article: '61.102', price: '28', img: 'nav1.jpg', height: '80мм', diam: '14мм', weight: '0.081кг', stock: 'Немає', inStock: false },
+                { name: 'Навіс 120мм', article: '61.102.01', price: '48', img: 'nav2.jpg', height: '120мм', diam: '22мм', weight: '0.160кг', stock: 'Немає', inStock: false },
+                { name: 'Навіс 160мм', article: '61.103', price: '98', img: 'nav3.jpg', height: '160мм', diam: '32мм', weight: '0.250кг', stock: 'Є', inStock: true },
+                { name: 'Навіс 150мм', article: '61.103.01', price: '57', img: 'nav4.jpg', height: '150мм', diam: '30мм', weight: '0.220кг', stock: 'Немає', inStock: false },
+                { name: 'Навіс 60мм', article: '61.104', price: '17', img: 'nav5.jpg', height: '60мм', diam: '10мм', weight: '0.050кг', stock: 'Немає', inStock: false }
+            ],
+            gates: [
+                { name: 'Ворота розсувні', article: 'GT-001', price: '12500', img: 'gate1.jpg', height: '2000мм', width: '4000мм', material: 'Метал', stock: 'Під замовлення', inStock: false },
+                { name: 'Ворота розпашні', article: 'GT-002', price: '9800', img: 'gate2.jpg', height: '2000мм', width: '3500мм', material: 'Метал', stock: 'Є', inStock: true },
+                { name: 'Ворота з хвірткою', article: 'GT-003', price: '15600', img: 'gate3.jpg', height: '2000мм', width: '4000мм', material: 'Метал/профнастил', stock: 'Є', inStock: true },
+                { name: 'Ворота секційні', article: 'GT-004', price: '18700', img: 'gate4.jpg', height: '2250мм', width: '3000мм', material: 'Сендвіч-панель', stock: 'Немає', inStock: false },
+                { name: 'Ворота автоматичні', article: 'GT-005', price: '23500', img: 'gate5.jpg', height: '2000мм', width: '4000мм', material: 'Метал/автоматика', stock: 'Під замовлення', inStock: false }
+            ]
+        };
+
+        // Функція скролу до категорії
+        function scrollToCategory(category) {
+            document.getElementById(category).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Функція відкриття фото
+        function openImage(src) {
+            document.getElementById('expandedImg').src = src;
+            document.getElementById('imageModal').style.display = 'block';
+        }
+
+        // Рендер товарів
+        function renderProducts() {
+            // Двері
+            let doorsHtml = '';
+            products.doors.forEach((p, index) => {
+                doorsHtml += `
+                    <div class="product-card">
+                        <div class="product-image" onclick='openImage("${p.img}")'>
+                            <img src="${p.img}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/300x200?text=Фото+немає'">
+                        </div>
+                        <div class="product-info">
+                            <div class="product-name">${p.name}</div>
+                            <div class="product-article">${p.article}</div>
+                            <div class="product-price">${p.price} грн</div>
+                            <button class="view-btn" onclick='showProduct("doors", ${index})'>ПЕРЕГЛЯНУТИ</button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('doorsGrid').innerHTML = doorsHtml;
+
+            // Навіси
+            let navisyHtml = '';
+            products.navisy.forEach((p, index) => {
+                navisyHtml += `
+                    <div class="product-card">
+                        <div class="product-image" onclick='openImage("${p.img}")'>
+                            <img src="${p.img}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/300x200?text=Фото+немає'">
+                        </div>
+                        <div class="product-info">
+                            <div class="product-name">${p.name}</div>
+                            <div class="product-article">${p.article}</div>
+                            <div class="product-price">${p.price} грн</div>
+                            <button class="view-btn" onclick='showProduct("navisy", ${index})'>ПЕРЕГЛЯНУТИ</button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('navisyGrid').innerHTML = navisyHtml;
+
+            // Ворота
+            let gatesHtml = '';
+            products.gates.forEach((p, index) => {
+                gatesHtml += `
+                    <div class="product-card">
+                        <div class="product-image" onclick='openImage("${p.img}")'>
+                            <img src="${p.img}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/300x200?text=Фото+немає'">
+                        </div>
+                        <div class="product-info">
+                            <div class="product-name">${p.name}</div>
+                            <div class="product-article">${p.article}</div>
+                            <div class="product-price">${p.price} грн</div>
+                            <button class="view-btn" onclick='showProduct("gates", ${index})'>ПЕРЕГЛЯНУТИ</button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('gatesGrid').innerHTML = gatesHtml;
+        }
+
+        // Показ деталей товару
+        function showProduct(category, index) {
+            const p = products[category][index];
+            
+            let specs = '';
+            if (category === 'navisy') {
+                specs = `
+                    <div class="spec-row"><span>Висота:</span> <span>${p.height}</span></div>
+                    <div class="spec-row"><span>Діаметр:</span> <span>${p.diam}</span></div>
+                    <div class="spec-row"><span>Вага:</span> <span>${p.weight}</span></div>
+                `;
+            } else {
+                specs = `
+                    <div class="spec-row"><span>Висота:</span> <span>${p.height}</span></div>
+                    <div class="spec-row"><span>Ширина:</span> <span>${p.width}</span></div>
+                    <div class="spec-row"><span>Матеріал:</span> <span>${p.material}</span></div>
+                `;
+            }
+
+            document.getElementById('modalContent').innerHTML = `
+                <div class="product-detail">
+                    <div class="detail-gallery" onclick="openImage('${p.img}')">
+                        <img src="${p.img}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/500x400?text=Фото+немає'">
+                    </div>
+                    <div>
+                        <div class="detail-title">${p.name}</div>
+                        <div class="detail-article">Артикул: ${p.article}</div>
+                        
+                        <div class="specs">
+                            ${specs}
+                            <div class="spec-row">
+                                <span>Наявність:</span>
+                                <span class="${p.inStock ? 'available' : ''}">${p.stock}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-price">${p.price} грн</div>
+                        
+                        <button class="buy-btn" onclick="alert('Дякуємо! Скоро з вами зв\'яжуться')">Замовити</button>
+                        
+                        <div class="delivery-block">
+                            <div class="delivery-title">Доставка</div>
+                            <ul class="delivery-list">
+                                <li>По всій Україні</li>
+                                <li>Нова Пошта</li>
+                                <li>Самовивіз</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('productModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+
+        // Запуск
+        renderProducts();
+    </script>
+</body>
+</html>
